@@ -1,114 +1,107 @@
 import streamlit as st
-import cv2
 import tempfile
-import time
-import mediapipe as mp
-import numpy as np
+import os
+import pandas as pd
+from io import BytesIO
+from datetime import datetime
+from utils import process_video  # Pastikan fungsi ini sudah ada dan bekerja
 
-# Inisialisasi Mediapipe
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True)
+# --- Konfigurasi halaman ---
+st.set_page_config(page_title="🚗 Deteksi Kantuk Pengemudi", layout="wide")
 
-# Fungsi EAR sederhana (versi ilustrasi)
-def calculate_ear(landmarks, eye_indices):
-    eye = np.array([landmarks[i] for i in eye_indices])
-    A = np.linalg.norm(eye[1] - eye[5])
-    B = np.linalg.norm(eye[2] - eye[4])
-    C = np.linalg.norm(eye[0] - eye[3])
-    ear = (A + B) / (2.0 * C)
-    return ear
+# --- Header dengan gaya HTML ---
+st.markdown("""
+    <h1 style='text-align: center; color: navy;'>🚘 Deteksi Kantuk Pengemudi</h1>
+    <p style='text-align: center; font-size:18px'>
+        Unggah satu atau beberapa video untuk mendeteksi kantuk berdasarkan analisis mata dan mulut.
+    </p>
+    <hr style='border:1px solid #bbb'/>
+""", unsafe_allow_html=True)
 
-# Indeks landmark untuk mata dan mulut (Mediapipe)
-LEFT_EYE = [362, 385, 387, 263, 373, 380]
-RIGHT_EYE = [33, 160, 158, 133, 153, 144]
-MOUTH = [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308]
+# --- Sidebar ---
+with st.sidebar:
+    st.header("📌 Tentang Aplikasi")
+    st.info("Aplikasi ini menggunakan MediaPipe & OpenCV untuk mendeteksi tanda kantuk dengan parameter seperti kedipan mata dan menguap.")
+    st.markdown("**Pengembang:** Kelly Chan")
+    st.markdown("**Kelas:** 4 TI A")
 
-st.title("Drowsiness Detection")
-st.markdown("Pendeteksian kantuk dengan indikator berupa **kedipan mata** dan **menguap**.")
+# --- Inisialisasi session state ---
+if "results" not in st.session_state:
+    st.session_state.results = []
 
-uploaded_file = st.file_uploader("Upload video", type=["mp4", "avi", "mov"])
+# --- Upload video ---
+uploaded_files = st.file_uploader("📤 Silakan Upload Video (.mp4)", type=["mp4"], accept_multiple_files=True)
 
-if uploaded_file:
-    tfile = tempfile.NamedTemporaryFile(delete=False)
-    tfile.write(uploaded_file.read())
+# --- Tombol Deteksi ---
+if uploaded_files and st.button("🚦 Deteksi Sekarang"):
+    st.info("⏳ Harap menunggu, video sedang diproses...")
 
-    cap = cv2.VideoCapture(tfile.name)
-    stframe = st.empty()
+    results = []
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
 
-    drowsy_count = 0
-    drowsy_total_duration = 0
-    start_drowsy_time = None
+    for file in uploaded_files:
+        tfile = tempfile.NamedTemporaryFile(delete=False)
+        tfile.write(file.read())
+        output_path = os.path.join(output_dir, f"detected_{file.name}")
 
-    EAR_THRESHOLD = 0.25
-    YAWN_THRESHOLD = 25  # Jarak antar bibir
-    FRAME_THRESHOLD = 15
-    closed_eyes_frame = 0
-    frame_rate = cap.get(cv2.CAP_PROP_FPS)
+        drowsy_count, drowsy_duration = process_video(tfile.name, output_path)
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+        results.append({
+            "nama_file": file.name,
+            "jumlah_kantuk": drowsy_count,
+            "durasi_kantuk": drowsy_duration,
+            "output_video": output_path
+        })
 
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = face_mesh.process(rgb)
+    st.session_state.results = results
+    st.success("✅ Deteksi Kantuk Selesai!")
 
-        if results.multi_face_landmarks:
-            for face_landmarks in results.multi_face_landmarks:
-                h, w, _ = frame.shape
-                landmarks = [(int(l.x * w), int(l.y * h)) for l in face_landmarks.landmark]
+# --- Tampilkan hasil deteksi jika ada ---
+if st.session_state.results:
+    today = datetime.today().strftime("%Y-%m-%d")
 
-                left_ear = calculate_ear(landmarks, LEFT_EYE)
-                right_ear = calculate_ear(landmarks, RIGHT_EYE)
-                avg_ear = (left_ear + right_ear) / 2.0
+    # Data untuk Excel
+    df = pd.DataFrame([
+        {
+            "Tanggal Deteksi": today,
+            "Nama File": r["nama_file"],
+            "Durasi Kantuk (detik)": r["durasi_kantuk"],
+            "Jumlah Kantuk Terdeteksi": r["jumlah_kantuk"]
+        }
+        for r in st.session_state.results
+    ])
 
-                top_lip = landmarks[13][1]
-                bottom_lip = landmarks[14][1]
-                mouth_open = abs(top_lip - bottom_lip)
+    # Buffer Excel
+    excel_buffer = BytesIO()
+    df.to_excel(excel_buffer, index=False, sheet_name="Hasil Deteksi")
+    excel_buffer.seek(0)
 
-                is_drowsy = avg_ear < EAR_THRESHOLD or mouth_open > YAWN_THRESHOLD
+    # Tampilkan tombol download di atas hasil
+    st.markdown("### 📥 Download Laporan")
+    st.download_button(
+        label="Download Hasil sebagai Excel",
+        data=excel_buffer,
+        file_name=f"hasil_deteksi_{today}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-                if is_drowsy:
-                    closed_eyes_frame += 1
-                    if closed_eyes_frame >= FRAME_THRESHOLD:
-                        text = "DROWSY ALERT!"
-                        font_scale = 2.0
-                        thickness = 3
-                        font = cv2.FONT_HERSHEY_SIMPLEX
-                        padding = 10
+    st.markdown("---")
 
-                        # Ukur ukuran teks
-                        (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness)
+    # Statistik ringkas
+    st.markdown("### 📊 Ringkasan Deteksi")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Jumlah Video", len(st.session_state.results))
+    col2.metric("Total Kantuk", sum([r["jumlah_kantuk"] for r in st.session_state.results]))
+    col3.metric("Durasi Kantuk", sum([r["durasi_kantuk"] for r in st.session_state.results]))
 
-                        # Hitung posisi kotak dengan padding
-                        top_left = (50, 50)
-                        bottom_right = (
-                            top_left[0] + text_width + 2 * padding,
-                            top_left[1] + text_height + 2 * padding
-                        )
-
-                        # Gambar kotak putih dengan padding
-                        cv2.rectangle(frame, top_left, bottom_right, (255, 255, 255), -1)
-
-                        # Gambar teks di atas kotak, digeser agar sesuai padding
-                        text_position = (top_left[0] + padding, top_left[1] + text_height + padding)
-                        cv2.putText(frame, text, text_position, font, font_scale, (0, 0, 255), thickness)
-
-                        if start_drowsy_time is None:
-                            start_drowsy_time = time.time()
-
-                else:
-                    if start_drowsy_time:
-                        drowsy_duration = time.time() - start_drowsy_time
-                        drowsy_total_duration += drowsy_duration
-                        drowsy_count += 1
-                        start_drowsy_time = None
-                    closed_eyes_frame = 0
-
-        # Tampilkan frame
-        stframe.image(frame, channels="BGR")
-
-    cap.release()
-    st.success(f"Deteksi selesai.")
-    st.write(f"Jumlah Kantuk Terdeteksi: **{drowsy_count} kali**")
-    st.write(f"Total Durasi Kantuk: **{drowsy_total_duration:.2f} detik**")
+    # Detail video per file
+    st.markdown("### 🎥 Hasil Deteksi per Video")
+    for res in st.session_state.results:
+        with st.expander(f"📄 {res['nama_file']}"):
+            col1, col2, col3 = st.columns([2, 2, 4])
+            col1.metric("Jumlah Kantuk Terdeteksi", res["jumlah_kantuk"])
+            col2.metric("Durasi Kantuk", f"{res['durasi_kantuk']} detik")
+            with open(res["output_video"], 'rb') as video_file:
+                video_bytes = video_file.read()
+                col3.video(video_bytes)
