@@ -1,18 +1,20 @@
 # 🚘 Driver Drowsiness Detection
-This website is built with Streamlit and is designed to detect signs of drowsiness in driver videos. Detection is based on eye and mouth movements using MediaPipe Face Mesh and OpenCV.
+A web-based app built with **Streamlit** to detect driver drowsiness from video files using **MediaPipe Face Mesh** and **OpenCV**. The system analyzes **eye aspect ratio (EAR)** and **mouth opening (yawn detection)** to identify signs of drowsiness.
 
 # 🔍 Key Features
-- 😪 Drowsiness Detection: Uses EAR (Eye Aspect Ratio) and lip distance
-- 📁 Automatic Excel Report: Detection results can be exported
+- 😴 **Drowsiness Detection**: Identifies drowsy behavior via eye blinking and yawning patterns.
+- 📊 **Excel Report Export**: Automatically generates a downloadable report of detection results per video.
+- 🎥 **Video Processing**: Handles multiple video uploads with per-frame face landmark detection.
 
 # 🛠️ Technologies
 - Python 3.x
+- Streamlit
 - OpenCV
 - MediaPipe
-- Streamlit
 - Pandas, NumPy
+- Matplotlib, PIL
 
-# 🚀 How to Run
+# 🚀 How to Run the Project
 1. Clone the repository
 ```
 git clone https://github.com/username/drowsy-detection-app.git
@@ -25,8 +27,11 @@ pip install -r requirements.txt
 ```
 
 3. Create an output folder in the project root
+```
+mkdir output
+```
 
-4. Jalankan aplikasi Streamlit
+4. Run the Streamlit app
 ```
 streamlit run app.py
 ```
