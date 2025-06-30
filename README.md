@@ -14,7 +14,7 @@ A web-based app built with **Streamlit** to detect driver drowsiness from video 
 - Pandas, NumPy
 - Matplotlib, PIL
 
-# 🚀 How to Run the Project
+# 🚀 How to Set up the Project
 1. Clone the repository
 ```
 git clone https://github.com/username/drowsy-detection-app.git
