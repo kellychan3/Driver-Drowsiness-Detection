@@ -1,5 +1,5 @@
 # 🚘 Deteksi Kantuk Pengemudi 
-Website yang dibuat dengan menggunakan streamlit. website ini dapat mendeteksi kantuk pada video pengemudi berdasarkan pergerakan mata dan mulut menggunakan MediaPipe Face Mesh dan OpenCV. 
+Website ini dibuat menggunakan Streamlit, berfungsi untuk mendeteksi tanda-tanda kantuk pada video pengemudi. Deteksi dilakukan berdasarkan pergerakan mata dan mulut menggunakan MediaPipe Face Mesh dan OpenCV.
 
 # 🔍 Fitur Utama
 - 😪 Deteksi Kantuk: Menggunakan rasio EAR (Eye Aspect Ratio) dan jarak antar bibir
