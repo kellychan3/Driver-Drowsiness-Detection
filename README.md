@@ -1,19 +1,19 @@
-# 🚘 Deteksi Kantuk Pengemudi 
-Website ini dibuat menggunakan Streamlit, berfungsi untuk mendeteksi tanda-tanda kantuk pada video pengemudi. Deteksi dilakukan berdasarkan pergerakan mata dan mulut menggunakan MediaPipe Face Mesh dan OpenCV.
+# 🚘 Driver Drowsiness Detection
+This website is built with Streamlit and is designed to detect signs of drowsiness in driver videos. Detection is based on eye and mouth movements using MediaPipe Face Mesh and OpenCV.
 
-# 🔍 Fitur Utama
-- 😪 Deteksi Kantuk: Menggunakan rasio EAR (Eye Aspect Ratio) dan jarak antar bibir
-- 📁 Laporan Excel Otomatis: Hasil deteksi dapat diekspor
+# 🔍 Key Features
+- 😪 Drowsiness Detection: Uses EAR (Eye Aspect Ratio) and lip distance
+- 📁 Automatic Excel Report: Detection results can be exported
 
-# 🛠️ Teknologi
+# 🛠️ Technologies
 - Python 3.x
 - OpenCV
 - MediaPipe
 - Streamlit
 - Pandas, NumPy
 
-# 🚀 Cara Menjalankan
-1. Clone repositori
+# 🚀 How to Run
+1. Clone the repository
 ```
 git clone https://github.com/username/drowsy-detection-app.git
 cd drowsy-detection-app
@@ -24,7 +24,7 @@ cd drowsy-detection-app
 pip install -r requirements.txt
 ```
 
-3. Buat folder output di root proyek
+3. Create an output folder in the project root
 
 4. Jalankan aplikasi Streamlit
 ```
