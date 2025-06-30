@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
-from utils import process_video  # Pastikan fungsi ini sudah ada dan bekerja
+from utils import process_video  
 
 # --- Konfigurasi halaman ---
 st.set_page_config(page_title="🚗 Deteksi Kantuk Pengemudi", layout="wide")

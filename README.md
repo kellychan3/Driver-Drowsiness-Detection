@@ -24,7 +24,9 @@ cd drowsy-detection-app
 pip install -r requirements.txt
 ```
 
-3. Jalankan aplikasi Streamlit
+3. Buat folder output di root proyek
+
+4. Jalankan aplikasi Streamlit
 ```
 streamlit run app.py
 ```
