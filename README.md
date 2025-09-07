@@ -1,4 +1,7 @@
 # 🚘 Driver Drowsiness Detection
+<img width="962" height="805" alt="home" src="https://github.com/user-attachments/assets/8a4e075a-f1eb-452f-af65-fc6baddacc2f" />
+<img width="955" height="887" alt="result" src="https://github.com/user-attachments/assets/63fc8666-24d7-4641-b895-2fd26ccdc8ee" />
+
 A web-based app built with **Streamlit** to detect driver drowsiness from video files using **MediaPipe Face Mesh** and **OpenCV**. The system analyzes **eye aspect ratio (EAR)** and **mouth opening (yawn detection)** to identify signs of drowsiness.
 
 # 🔍 Key Features
