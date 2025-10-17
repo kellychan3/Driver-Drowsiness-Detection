@@ -5,7 +5,7 @@
 
 - [Project Overview](#project-overview)
 - [Project Statement](#project-statement)
-- [Scope & Limitation](#scope-&-limitation)
+- [Scope & Limitation](#scope--limitation)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [How-It-Works](#how-it-works)
