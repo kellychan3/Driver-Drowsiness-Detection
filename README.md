@@ -4,8 +4,8 @@
 **Table of Contents**
 
 - [Project Overview](#project-overview)
-- [Project Statement](#project-statement)
-- [Scope & Limitation](#scope--limitation)
+- [Problem Statement](#problem-statement)
+- [Scope & Limitations](#scope--limitations)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [How-It-Works](#how-it-works)
